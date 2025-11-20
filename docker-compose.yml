@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  backend:
+    build: ./backend/app
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-1234}
+      - LIBRE_TRANSLATE_URL=${LIBRE_TRANSLATE_URL:-}
+    volumes:
+      - ./backend/app/uploads:/app/uploads
+      - ./backend/app/outputs:/app/outputs

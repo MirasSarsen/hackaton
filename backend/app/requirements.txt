@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+python-multipart
+aiofiles
+pydantic
+openai
+pillow
+requests

@@ -4,6 +4,7 @@ import axios from "axios";
 export default function UploadForm({ onResult }) {
   const [file, setFile] = React.useState(null);
   const [lang, setLang] = React.useState("ru");
+  const [voice, setVoice] = React.useState("random"); // <-- добавлено
   const [style, setStyle] = React.useState("normal");
   const [replaceImage, setReplaceImage] = React.useState(false);
   const [progress, setProgress] = React.useState(null);
@@ -27,6 +28,7 @@ export default function UploadForm({ onResult }) {
     form.append("translate_to", lang);
     form.append("style", style);
     form.append("replace_image_text", replaceImage ? "true" : "false");
+    form.append("speaker", voice); // <-- передаём voice в /tts
 
     setProgress("processing");
     const proc = await axios.post("http://localhost:8000/process", form);
@@ -47,6 +49,13 @@ export default function UploadForm({ onResult }) {
           <option value="en">English</option>
           <option value="tr">Turkish</option>
           <option value="zh">Chinese</option>
+        </select>
+
+        <label style={{ marginLeft: 12 }}>Voice: </label>
+        <select value={voice} onChange={(e) => setVoice(e.target.value)}>
+          <option value="random">Random</option>
+          <option value="alloy">Alloy</option>
+          <option value="v3">V3</option>
         </select>
 
         <label style={{ marginLeft: 12 }}>Style: </label>

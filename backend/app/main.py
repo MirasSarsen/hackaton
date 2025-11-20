@@ -175,7 +175,6 @@ def ocr_with_boxes(path):
 
     return results
 
-
 def ocr_lines(path):
     """
     Возвращает строки с bbox:
@@ -420,6 +419,8 @@ def translate_lines(lines, target_lang):
         translated.append(out.strip())
     return translated
 
+SUPPORTED_LANGS = ["ru", "kz", "en", "tr", "zh"]
+
 # ----------------------------------------
 # Upload
 # ----------------------------------------
@@ -441,6 +442,12 @@ async def process(
     style: str = Form("normal"),
     replace_image_text: bool = Form(True)
 ):
+    if translate_to not in SUPPORTED_LANGS:
+        return JSONResponse(
+            status_code=400,
+            content={"error": f"Unsupported language: {translate_to}. Supported: {SUPPORTED_LANGS}"}
+        )
+
     path = UPLOAD_DIR / filename
     if not path.exists():
         return JSONResponse(status_code=404, content={"error": "file not found"})
@@ -477,7 +484,7 @@ async def process(
         # 4) вставка перевода в картинку
         translated_image_url = None
         if replace_image_text:
-            out_path = replace_lines_on_image(str(path), ocr_lines_result, translated_lines)
+            out_path = replace_text_on_image(str(path), ocr_lines_result, translated_lines)
             translated_image_url = f"/outputs/{Path(out_path).name}"
 
     else:
@@ -489,7 +496,14 @@ async def process(
     translation = openrouter_chat(
         "openai/gpt-3.5-turbo",
         [
-            {"role": "system", "content": f"Translate text into {translate_to}"},
+            {
+                "role": "system",
+                "content": (
+                    f"You are a professional translator. Translate the text into {translate_to}. "
+                    "Return ONLY the translated text. Keep formatting. "
+                    "For Chinese (zh), translate into simplified Chinese."
+                )
+            },
             {"role": "user", "content": text}
         ]
     )
@@ -535,7 +549,8 @@ async def process(
 
     return JSONResponse(content=jsonable_encoder(response))
 
-def replace_lines_on_image(image_path, lines, translated_lines):
+
+def replace_text_on_image(image_path, lines, translated_lines):
     img = Image.open(image_path).convert("RGB")
     draw = ImageDraw.Draw(img)
 

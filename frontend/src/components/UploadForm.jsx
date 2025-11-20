@@ -45,6 +45,8 @@ export default function UploadForm({ onResult }) {
           <option value="ru">Русский</option>
           <option value="kz">Қазақша</option>
           <option value="en">English</option>
+          <option value="tr">Turkish</option>
+          <option value="zh">Chinese</option>
         </select>
 
         <label style={{ marginLeft: 12 }}>Style: </label>

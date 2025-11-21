@@ -29,96 +29,107 @@ export default function ResultView({ result }) {
   };
 
   return (
-    <div style={{ marginTop: 16, padding: 16, border: "1px solid #eee", borderRadius: 8 }}>
-      <h3>📊 Results</h3>
+    <div className="card results-container">
+      <h3 className="results-title">📊 Processing Results</h3>
 
       {/* Original Text */}
-      <div style={{ marginBottom: 16 }}>
-        <strong>📝 Original Text:</strong>
-        <button onClick={() => generateTTS(result.original_text, "original")}
-          disabled={ttsLoading} style={{ marginLeft: 8, fontSize: 12 }}>
-          🔊 Listen
-        </button>
-        <pre style={{ whiteSpace: "pre-wrap", background: "#f5f5f5", padding: 8, borderRadius: 4 }}>
+      <div className="result-section original-section">
+        <div className="result-section-title">
+          <span>📝 Original Text</span>
+          <button 
+            onClick={() => generateTTS(result.original_text, "original")}
+            disabled={ttsLoading} 
+            className="btn btn-secondary"
+          >
+            🔊 Listen
+          </button>
+        </div>
+        <div className="result-text">
           {result.original_text}
-        </pre>
+        </div>
       </div>
 
-      {/* Speaker Diarization - NEW! */}
+      {/* Speaker Diarization */}
       {result.transcription?.segments && (
-        <div style={{ marginBottom: 16 }}>
-          <strong>🎙️ Transcription with Speakers & Timestamps:</strong>
-          <div style={{ background: "#f0f8ff", padding: 12, borderRadius: 4, marginTop: 8 }}>
-            {result.transcription.language && (
-              <div style={{ marginBottom: 8, color: "#666" }}>
-                Detected language: <b>{result.transcription.language}</b> |
-                Duration: <b>{formatTime(result.transcription.duration || 0)}</b>
-              </div>
-            )}
-            {result.transcription.segments.map((seg, i) => (
-              <div key={i} style={{
-                marginBottom: 8,
-                padding: 8,
-                background: seg.speaker === "Speaker 1" ? "#e3f2fd" : "#fff3e0",
-                borderRadius: 4,
-                borderLeft: `4px solid ${seg.speaker === "Speaker 1" ? "#2196F3" : "#FF9800"}`
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                  <span style={{ fontWeight: "bold", color: seg.speaker === "Speaker 1" ? "#1976D2" : "#F57C00" }}>
-                    {seg.speaker}
-                  </span>
-                  <span style={{ color: "#666", fontSize: 12 }}>
-                    ⏱️ {formatTime(seg.start)} - {formatTime(seg.end)}
-                  </span>
-                </div>
-                <div>{seg.text}</div>
-                {seg.words?.length > 0 && (
-                  <details style={{ marginTop: 4, fontSize: 11, color: "#888" }}>
-                    <summary>Show words ({seg.words.length})</summary>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
-                      {seg.words.map((w, j) => (
-                        <span key={j} style={{ background: "#fff", padding: "2px 4px", borderRadius: 2 }}>
-                          {w.word} <span style={{ color: "#aaa" }}>({formatTime(w.start)})</span>
-                        </span>
-                      ))}
-                    </div>
-                  </details>
-                )}
-              </div>
-            ))}
+        <div className="result-section transcription-container">
+          <div className="result-section-title">
+            <span>🎙️ Transcription with Speakers & Timestamps</span>
           </div>
+          
+          {result.transcription.language && (
+            <div className="transcription-meta">
+              <span>Detected language: <strong>{result.transcription.language}</strong></span>
+              <span>Duration: <strong>{formatTime(result.transcription.duration || 0)}</strong></span>
+            </div>
+          )}
+          
+          {result.transcription.segments.map((seg, i) => (
+            <div key={i} className={`speaker-segment ${seg.speaker === "Speaker 1" ? "speaker-1" : "speaker-2"}`}>
+              <div className="speaker-header">
+                <span className="speaker-name">{seg.speaker}</span>
+                <span className="timestamp">
+                  ⏱️ {formatTime(seg.start)} - {formatTime(seg.end)}
+                </span>
+              </div>
+              <div>{seg.text}</div>
+              {seg.words?.length > 0 && (
+                <details className="words-details">
+                  <summary>Show words ({seg.words.length})</summary>
+                  <div className="words-container">
+                    {seg.words.map((w, j) => (
+                      <span key={j} className="word-chip">
+                        {w.word} <span style={{ color: "#aaa" }}>({formatTime(w.start)})</span>
+                      </span>
+                    ))}
+                  </div>
+                </details>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
       {/* Translation */}
-      <div style={{ marginBottom: 16 }}>
-        <strong>🌐 Translation:</strong>
-        <button onClick={() => generateTTS(result.translation, "translation")}
-          disabled={ttsLoading} style={{ marginLeft: 8, fontSize: 12 }}>
-          🔊 Listen
-        </button>
-        <pre style={{ whiteSpace: "pre-wrap", background: "#e8f5e9", padding: 8, borderRadius: 4 }}>
+      <div className="result-section translation-section">
+        <div className="result-section-title">
+          <span>🌐 Translation</span>
+          <button 
+            onClick={() => generateTTS(result.translation, "translation")}
+            disabled={ttsLoading} 
+            className="btn btn-secondary"
+          >
+            🔊 Listen
+          </button>
+        </div>
+        <div className="result-text">
           {result.translation}
-        </pre>
+        </div>
       </div>
 
       {/* Paraphrase */}
-      <div style={{ marginBottom: 16 }}>
-        <strong>✨ Paraphrase:</strong>
-        <button onClick={() => generateTTS(result.paraphrase, "paraphrase")}
-          disabled={ttsLoading} style={{ marginLeft: 8, fontSize: 12 }}>
-          🔊 Listen
-        </button>
-        <pre style={{ whiteSpace: "pre-wrap", background: "#fff3e0", padding: 8, borderRadius: 4 }}>
+      <div className="result-section paraphrase-section">
+        <div className="result-section-title">
+          <span>✨ Paraphrase</span>
+          <button 
+            onClick={() => generateTTS(result.paraphrase, "paraphrase")}
+            disabled={ttsLoading} 
+            className="btn btn-secondary"
+          >
+            🔊 Listen
+          </button>
+        </div>
+        <div className="result-text">
           {result.paraphrase}
-        </pre>
+        </div>
       </div>
 
       {/* TTS Audio Player */}
       {ttsAudio && (
-        <div style={{ marginBottom: 16, padding: 12, background: "#e1f5fe", borderRadius: 4 }}>
-          <strong>🎵 Generated Audio ({ttsAudio.type}):</strong>
-          <audio controls src={ttsAudio.url} style={{ width: "100%", marginTop: 8 }} />
+        <div className="result-section audio-container">
+          <div className="result-section-title">
+            <span>🎵 Generated Audio ({ttsAudio.type})</span>
+          </div>
+          <audio controls src={ttsAudio.url} className="audio-player" />
         </div>
       )}
 
@@ -132,35 +143,32 @@ export default function ResultView({ result }) {
 
       {/* Translated Image */}
       {result.translated_image_url && (
-        <div style={{ marginBottom: 16 }}>
-          <strong>🖼️ Translated Image:</strong>
-          <img src={`http://localhost:8000${result.translated_image_url}`} alt="translated"
-            style={{ maxWidth: "100%", border: "1px solid #ddd", marginTop: 8, borderRadius: 4 }} />
+        <div className="result-section">
+          <div className="result-section-title">
+            <span>🖼️ Translated Image</span>
+          </div>
+          <img 
+            src={`http://localhost:8000${result.translated_image_url}`} 
+            alt="Translated image with replaced text"
+            className="translated-image" 
+          />
         </div>
       )}
 
       {/* Download Links */}
-      <div style={{ marginTop: 16 }}>
-        <strong>📥 Download:</strong>
-        <a href={`http://localhost:8000${result.files.translation}`} download style={{ marginLeft: 8 }}>
-          Translation.txt
-        </a>
-        <a href={`http://localhost:8000${result.files.paraphrase}`} download style={{ marginLeft: 12 }}>
-          Paraphrase.txt
-        </a>
+      <div className="download-section">
+        <div className="result-section-title">
+          <span>📥 Download Files</span>
+        </div>
+        <div className="download-links">
+          <a href={`http://localhost:8000${result.files.translation}`} download className="download-link">
+            📄 Translation.txt
+          </a>
+          <a href={`http://localhost:8000${result.files.paraphrase}`} download className="download-link">
+            ✨ Paraphrase.txt
+          </a>
+        </div>
       </div>
-    </div>
-  );
-}
-
-// App.jsx
-export function App() {
-  const [result, setResult] = React.useState(null);
-
-  return (
-    <div style={{ maxWidth: 900, margin: "20px auto", fontFamily: "system-ui" }}>
-      <UploadForm onResult={setResult} />
-      {result && <ResultView result={result} />}
     </div>
   );
 }
